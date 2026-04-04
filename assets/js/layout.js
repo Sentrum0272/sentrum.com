@@ -16,28 +16,11 @@ async function loadComponent(selector, path) {
 }
 
 function getComponentPath(fileName) {
-  const currentPath = window.location.pathname;
-  const depth = currentPath.split("/").filter(Boolean).length;
-
-  if (depth <= 1) {
-    return `./components/${fileName}`;
-  }
-
-  return `../components/${fileName}`;
+  return `./components/${fileName}`;
 }
 
 function normalizeLinkPaths(root) {
   if (!root) return;
-
-  const links = root.querySelectorAll('a[href^="./"]');
-  const isRootPage = window.location.pathname.split("/").filter(Boolean).length <= 1;
-
-  if (isRootPage) return;
-
-  links.forEach((link) => {
-    const href = link.getAttribute("href");
-    link.setAttribute("href", href.replace("./", "../"));
-  });
 }
 
 function setActiveNav(headerRoot) {
@@ -98,27 +81,15 @@ function initBackToTop() {
   const backToTopButton = document.querySelector(".back-to-top");
   if (!backToTopButton) return;
 
-  let ticking = false;
-
   const toggleVisibility = () => {
     if (window.scrollY > 360) {
       backToTopButton.classList.add("is-visible");
     } else {
       backToTopButton.classList.remove("is-visible");
     }
-    ticking = false;
   };
 
-  window.addEventListener(
-    "scroll",
-    () => {
-      if (!ticking) {
-        window.requestAnimationFrame(toggleVisibility);
-        ticking = true;
-      }
-    },
-    { passive: true }
-  );
+  window.addEventListener("scroll", toggleVisibility, { passive: true });
 
   backToTopButton.addEventListener("click", () => {
     window.scrollTo({
@@ -134,28 +105,15 @@ function initHeaderScroll() {
   const header = document.querySelector(".site-header");
   if (!header) return;
 
-  let ticking = false;
-
   const handleScroll = () => {
     if (window.scrollY > 40) {
       header.classList.add("is-scrolled");
     } else {
       header.classList.remove("is-scrolled");
     }
-    ticking = false;
   };
 
-  window.addEventListener(
-    "scroll",
-    () => {
-      if (!ticking) {
-        window.requestAnimationFrame(handleScroll);
-        ticking = true;
-      }
-    },
-    { passive: true }
-  );
-
+  window.addEventListener("scroll", handleScroll, { passive: true });
   handleScroll();
 }
 
@@ -165,7 +123,6 @@ async function initSharedHeader() {
   const headerRoot = document.querySelector("#site-header");
   if (!headerRoot) return;
 
-  normalizeLinkPaths(headerRoot);
   setActiveNav(headerRoot);
   bindMobileNav(headerRoot);
   bindLangSwitcher(headerRoot);
@@ -176,8 +133,6 @@ async function initSharedFooter() {
 
   const footerRoot = document.querySelector("#site-footer");
   if (!footerRoot) return;
-
-  normalizeLinkPaths(footerRoot);
 }
 
 async function initSharedLayout() {
